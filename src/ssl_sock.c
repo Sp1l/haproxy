@@ -1596,7 +1596,7 @@ void ssl_sock_msgcbk(int write_p, int version, int content_type, const void *buf
 		ssl_sock_parse_clienthello(write_p, version, content_type, buf, len, ssl);
 }
 
-#ifdef OPENSSL_NPN_NEGOTIATED
+#if defined(OPENSSL_NPN_NEGOTIATED) && !defined(OPENSSL_NO_NEXTPROTONEG)
 /* This callback is used so that the server advertises the list of
  * negociable protocols for NPN.
  */
@@ -3500,7 +3500,7 @@ static int ssl_initialize_random()
 void ssl_sock_free_ssl_conf(struct ssl_bind_conf *conf)
 {
 	if (conf) {
-#ifdef OPENSSL_NPN_NEGOTIATED
+#if defined(OPENSSL_NPN_NEGOTIATED) && !defined(OPENSSL_NO_NEXTPROTONEG)
 		free(conf->npn_str);
 		conf->npn_str = NULL;
 #endif
@@ -4216,7 +4216,7 @@ int ssl_sock_prepare_ctx(struct bind_conf *bind_conf, struct ssl_bind_conf *ssl_
 	SSL_CTX_set_msg_callback(ctx, ssl_sock_msgcbk);
 #endif
 
-#ifdef OPENSSL_NPN_NEGOTIATED
+#if defined(OPENSSL_NPN_NEGOTIATED) && !defined(OPENSSL_NO_NEXTPROTONEG)
 	ssl_conf_cur = NULL;
 	if (ssl_conf && ssl_conf->npn_str)
 		ssl_conf_cur = ssl_conf;
@@ -6011,7 +6011,7 @@ static int ssl_sock_get_alpn(const struct connection *conn, const char **str, in
 	if (*str)
 		return 1;
 #endif
-#ifdef OPENSSL_NPN_NEGOTIATED
+#if defined(OPENSSL_NPN_NEGOTIATED) && !defined(OPENSSL_NO_NEXTPROTONEG)
 	SSL_get0_next_proto_negotiated(conn->xprt_ctx, (const unsigned char **)str, (unsigned *)len);
 	if (*str)
 		return 1;
@@ -6673,7 +6673,7 @@ smp_fetch_ssl_fc_use_keysize(const struct arg *args, struct sample *smp, const c
 	return 1;
 }
 
-#ifdef OPENSSL_NPN_NEGOTIATED
+#if defined(OPENSSL_NPN_NEGOTIATED) && !defined(OPENSSL_NO_NEXTPROTONEG)
 static int
 smp_fetch_ssl_fc_npn(const struct arg *args, struct sample *smp, const char *kw, void *private)
 {
@@ -7363,7 +7363,7 @@ static int bind_parse_allow_0rtt(char **args, int cur_arg, struct proxy *px, str
 /* parse the "npn" bind keyword */
 static int ssl_bind_parse_npn(char **args, int cur_arg, struct proxy *px, struct ssl_bind_conf *conf, char **err)
 {
-#ifdef OPENSSL_NPN_NEGOTIATED
+#if defined(OPENSSL_NPN_NEGOTIATED) && !defined(OPENSSL_NO_NEXTPROTONEG)
 	char *p1, *p2;
 
 	if (!*args[cur_arg + 1]) {
@@ -8538,7 +8538,7 @@ static struct sample_fetch_kw_list sample_fetch_keywords = {ILH, {
 	{ "ssl_fc_has_early",       smp_fetch_ssl_fc_has_early,   0,                   NULL,    SMP_T_BOOL, SMP_USE_L5CLI },
 	{ "ssl_fc_has_sni",         smp_fetch_ssl_fc_has_sni,     0,                   NULL,    SMP_T_BOOL, SMP_USE_L5CLI },
 	{ "ssl_fc_is_resumed",      smp_fetch_ssl_fc_is_resumed,  0,                   NULL,    SMP_T_BOOL, SMP_USE_L5CLI },
-#ifdef OPENSSL_NPN_NEGOTIATED
+#if defined(OPENSSL_NPN_NEGOTIATED) && !defined(OPENSSL_NO_NEXTPROTONEG)
 	{ "ssl_fc_npn",             smp_fetch_ssl_fc_npn,         0,                   NULL,    SMP_T_STR,  SMP_USE_L5CLI },
 #endif
 #ifdef TLSEXT_TYPE_application_layer_protocol_negotiation
@@ -8581,7 +8581,9 @@ static struct ssl_bind_kw ssl_bind_kws[] = {
 	{ "curves",                ssl_bind_parse_curves,           1 }, /* set SSL curve suite */
 	{ "ecdhe",                 ssl_bind_parse_ecdhe,            1 }, /* defines named curve for elliptic curve Diffie-Hellman */
 	{ "no-ca-names",           ssl_bind_parse_no_ca_names,      0 }, /* do not send ca names to clients (ca_file related) */
+#if !defined(OPENSSL_NO_NEXTPROTONEG)
 	{ "npn",                   ssl_bind_parse_npn,              1 }, /* set NPN supported protocols */
+#endif
 	{ "ssl-min-ver",           ssl_bind_parse_tls_method_minmax,1 }, /* minimum version */
 	{ "ssl-max-ver",           ssl_bind_parse_tls_method_minmax,1 }, /* maximum version */
 	{ "verify",                ssl_bind_parse_verify,           1 }, /* set SSL verify method */
@@ -8621,7 +8623,9 @@ static struct bind_kw_list bind_kws = { "SSL", { }, {
 	{ "strict-sni",            bind_parse_strict_sni,         0 }, /* refuse negotiation if sni doesn't match a certificate */
 	{ "tls-ticket-keys",       bind_parse_tls_ticket_keys,    1 }, /* set file to load TLS ticket keys from */
 	{ "verify",                bind_parse_verify,             1 }, /* set SSL verify method */
+#if !defined(OPENSSL_NO_NEXTPROTONEG)
 	{ "npn",                   bind_parse_npn,                1 }, /* set NPN supported protocols */
+#endif
 	{ "prefer-client-ciphers", bind_parse_pcc,                0 }, /* prefer client ciphers */
 	{ NULL, NULL, 0 },
 }};
