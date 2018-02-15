@@ -8581,9 +8581,7 @@ static struct ssl_bind_kw ssl_bind_kws[] = {
 	{ "curves",                ssl_bind_parse_curves,           1 }, /* set SSL curve suite */
 	{ "ecdhe",                 ssl_bind_parse_ecdhe,            1 }, /* defines named curve for elliptic curve Diffie-Hellman */
 	{ "no-ca-names",           ssl_bind_parse_no_ca_names,      0 }, /* do not send ca names to clients (ca_file related) */
-#if !defined(OPENSSL_NO_NEXTPROTONEG)
 	{ "npn",                   ssl_bind_parse_npn,              1 }, /* set NPN supported protocols */
-#endif
 	{ "ssl-min-ver",           ssl_bind_parse_tls_method_minmax,1 }, /* minimum version */
 	{ "ssl-max-ver",           ssl_bind_parse_tls_method_minmax,1 }, /* maximum version */
 	{ "verify",                ssl_bind_parse_verify,           1 }, /* set SSL verify method */
@@ -8623,9 +8621,7 @@ static struct bind_kw_list bind_kws = { "SSL", { }, {
 	{ "strict-sni",            bind_parse_strict_sni,         0 }, /* refuse negotiation if sni doesn't match a certificate */
 	{ "tls-ticket-keys",       bind_parse_tls_ticket_keys,    1 }, /* set file to load TLS ticket keys from */
 	{ "verify",                bind_parse_verify,             1 }, /* set SSL verify method */
-#if !defined(OPENSSL_NO_NEXTPROTONEG)
 	{ "npn",                   bind_parse_npn,                1 }, /* set NPN supported protocols */
-#endif
 	{ "prefer-client-ciphers", bind_parse_pcc,                0 }, /* prefer client ciphers */
 	{ NULL, NULL, 0 },
 }};
